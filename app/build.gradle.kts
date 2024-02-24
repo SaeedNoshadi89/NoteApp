@@ -26,8 +26,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -62,6 +61,13 @@ android {
 
 
 dependencies {
+    implementation(project(":core:data"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:notification"))
+    implementation(project(":core:work"))
+    implementation(project(":features:notes"))
+    implementation(project(":features:edit-note"))
+    implementation(project(":features:edit-note"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
@@ -69,12 +75,17 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.ui)
     implementation(libs.ui.graphics)
+    implementation(libs.androidx.window.manager)
+    implementation(libs.androidx.compose.material3.windowSizeClass)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-    implementation(libs.compose.navigation)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.kotlin.date.time)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.compose.navigation)
     implementation(libs.canary.leack)
-    implementation(libs.androidx.compose.material3.windowSizeClass)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
