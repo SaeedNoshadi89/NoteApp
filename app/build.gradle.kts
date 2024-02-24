@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.compose.navigation)
     implementation(libs.hilt.android)
+    implementation(libs.canary.leack)
+    implementation(libs.androidx.compose.material3.windowSizeClass)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
