@@ -5,6 +5,14 @@ import com.sn.utils.Result
 import kotlinx.coroutines.flow.Flow
 
 interface EditNoteRepository {
-    fun getNoteById(id: Int): Flow<Result<Note>>
-    suspend fun upsertNote(noteId: Int)
+    suspend fun getNoteById(noteId: String): Flow<Result<Note?>>
+
+    suspend fun updateNote(
+        noteId: String,
+        title: String,
+        description: String,
+        dueDateTime: String,
+        isCompleted: Boolean,
+        categoryId: Int
+    )
 }

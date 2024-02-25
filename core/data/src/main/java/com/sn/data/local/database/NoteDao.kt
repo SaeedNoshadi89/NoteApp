@@ -1,24 +1,20 @@
-package com.sn.data.database
+package com.sn.data.local.database
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.sn.data.entity.NoteEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
     @Query("SELECT * FROM note")
-    fun getAllNotes(): Flow<List<NoteEntity>>
+    fun getAllNotes(): List<NoteEntity>
 
     @Query("SELECT * FROM note WHERE id = :noteId")
-    fun getNoteById(noteId: String): Flow<NoteEntity>
+    fun getNoteById(noteId: String): NoteEntity?
 
     @Upsert
-    suspend fun upsert(note: NoteEntity)
-
-    @Upsert
-    suspend fun upsertAll(notes: List<NoteEntity>)
+    suspend fun upsertNote(note: NoteEntity)
 
     @Query("UPDATE note SET isCompleted = :completed WHERE id = :noteId")
     suspend fun updateCompleted(noteId: String, completed: Boolean)
@@ -28,4 +24,7 @@ interface NoteDao {
 
     @Query("DELETE FROM note WHERE isCompleted = 1")
     suspend fun deleteCompleted(): Int
+
+    @Query("DELETE FROM note")
+    suspend fun deleteAll()
 }

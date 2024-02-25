@@ -1,12 +1,17 @@
-package com.sn.domain.model
+package com.sn.data.entity
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDateTime
 
-data class Note(
-    val id: Long,
+@Entity(
+    tableName = "note"
+)
+data class NoteEntity(
+    @PrimaryKey val id: String,
     val title: String,
     val description: String?,
-    val dueDateTime: LocalDateTime,
+    val dueDateTime: String,
     val isCompleted: Boolean = false,
-    val category: String?
+    val category: Int?
 )

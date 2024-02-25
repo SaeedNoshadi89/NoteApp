@@ -7,6 +7,7 @@ import com.sn.utils.Result
 import kotlinx.coroutines.flow.Flow
 
 class GetNoteByIdUseCase constructor(private val repository: EditNoteRepository) {
-    operator fun invoke(id: Int): Flow<Result<Note>> =
-        repository.getNoteById(id)
+    suspend operator fun invoke(noteId: String): Flow<Result<Note?>> =
+        repository.getNoteById(noteId)
+
 }

@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlin.date.time)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.turbine)

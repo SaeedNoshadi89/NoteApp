@@ -5,8 +5,34 @@ import com.sn.utils.Result
 import kotlinx.coroutines.flow.Flow
 
 interface NotesRepository {
-    fun getAllNotes(categoryId: Int): Flow<Result<List<Note>>>
-    suspend fun upsertNote(noteId: Int)
-    fun deleteNote(note: Note): Flow<Result<Unit>>
-    suspend fun completeTask(taskId: String)
+
+    suspend fun createNote(
+        title: String,
+        description: String,
+        dueDateTime: String,
+        categoryId: Int
+    ): String
+
+    suspend fun getAllNotes(categoryId: Int): Flow<Result<List<Note>>>
+
+    fun getNoteById(noteId: String): Flow<Result<Note?>>
+
+    suspend fun updateNote(
+        noteId: String,
+        title: String,
+        description: String,
+        dueDateTime: String,
+        isCompleted: Boolean,
+        categoryId: Int
+    )
+
+    suspend fun deleteNote(noteId: String)
+
+    suspend fun completeNote(noteId: String)
+
+    suspend fun activateNote(noteId: String)
+
+    suspend fun clearCompletedNotes()
+
+    suspend fun deleteAllNotes()
 }

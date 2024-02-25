@@ -6,6 +6,6 @@ import com.sn.utils.Result
 import kotlinx.coroutines.flow.Flow
 
 class DeleteNoteUseCase constructor(private val repository: NotesRepository) {
-    operator fun invoke(note: Note): Flow<Result<Unit>> =
-        repository.deleteNote(note)
+    suspend operator fun invoke(noteId: String) =
+        repository.deleteNote(noteId)
 }
