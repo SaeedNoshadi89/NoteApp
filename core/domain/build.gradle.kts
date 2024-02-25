@@ -36,6 +36,7 @@ android {
 
 dependencies {
 
+    api(project(":core:utils"))
     implementation(libs.core.ktx)
     implementation(libs.hilt.android)
     implementation(libs.kotlin.date.time)
