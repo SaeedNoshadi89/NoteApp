@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/features/add-note" />
             <option value="$PROJECT_DIR$/features/edit-note" />
             <option value="$PROJECT_DIR$/features/notes" />
+            <option value="$PROJECT_DIR$/shared-test" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

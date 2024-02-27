@@ -9,7 +9,6 @@ fun Note.toEntity() = NoteEntity(
     description = description,
     isCompleted = isCompleted,
     dueDateTime = dueDateTime,
-    category = category,
 )
 
 fun NoteEntity.toModel() = Note(
@@ -18,7 +17,6 @@ fun NoteEntity.toModel() = Note(
     description = description,
     isCompleted = isCompleted,
     dueDateTime = dueDateTime,
-    category = category,
 )
 
 @JvmName("entityToModel")

@@ -1,21 +1,13 @@
 package com.sn.domain.gateway
 
 import com.sn.domain.model.Note
-import com.sn.utils.Result
 import kotlinx.coroutines.flow.Flow
 
 interface NotesRepository {
 
-    suspend fun createNote(
-        title: String,
-        description: String,
-        dueDateTime: String,
-        categoryId: Int
-    ): String
+    suspend fun getAllNotes(): Flow<List<Note>>
 
-    suspend fun getAllNotes(categoryId: Int): Flow<Result<List<Note>>>
-
-    fun getNoteById(noteId: String): Flow<Result<Note?>>
+    fun getNoteById(noteId: String): Flow<Note?>
 
     suspend fun updateNote(
         noteId: String,
@@ -23,7 +15,6 @@ interface NotesRepository {
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
-        categoryId: Int
     )
 
     suspend fun deleteNote(noteId: String)
