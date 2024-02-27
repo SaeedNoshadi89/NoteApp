@@ -6,7 +6,6 @@ import com.sn.data.data_sourse.LocalDataSource
 import com.sn.data.ext.toEntity
 import com.sn.data.ext.toModel
 import com.sn.domain.model.Note
-import com.sn.utils.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -17,35 +16,14 @@ import javax.inject.Inject
 
 class NotesRepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
 ) : NotesRepository {
-    override suspend fun createNote(
-        title: String,
-        description: String,
-        dueDateTime: String,
-        categoryId: Int
-    ): String {
-        val noteId = withContext(dispatcher) {
-            UUID.randomUUID().toString()
-        }
-        val note = Note(
-            title = title,
-            description = description,
-            id = noteId,
-            dueDateTime = dueDateTime,
-            isCompleted = false,
-            category = categoryId,
-        )
-        localDataSource.upsertNote(note.toEntity())
-        return noteId
+
+    override suspend fun getAllNotes(): Flow<List<Note>> = flow {
+        emit(localDataSource.getAllNotes())
     }
 
-    override suspend fun getAllNotes(categoryId: Int): Flow<Result<List<Note>>> = flow {
-        emit(Result.Success(localDataSource.getAllNotes(categoryId)))
-    }
-
-    override fun getNoteById(noteId: String): Flow<Result<Note?>> = flow {
-        emit(Result.Success(localDataSource.getNoteById(noteId)?.toModel()))
+    override fun getNoteById(noteId: String): Flow<Note?> = flow {
+        emit(localDataSource.getNoteById(noteId)?.toModel())
     }
 
 
@@ -55,7 +33,6 @@ class NotesRepositoryImpl @Inject constructor(
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
-        categoryId: Int
     ) {
         val note = localDataSource.getNoteById(noteId)?.copy(
             title = title,
@@ -63,7 +40,6 @@ class NotesRepositoryImpl @Inject constructor(
             id = noteId,
             dueDateTime = dueDateTime,
             isCompleted = isCompleted,
-            category = categoryId
         ) ?: throw Exception("Note (id $noteId) not found")
 
         localDataSource.upsertNote(note)

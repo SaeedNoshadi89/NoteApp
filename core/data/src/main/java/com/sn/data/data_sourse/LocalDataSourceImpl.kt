@@ -1,11 +1,9 @@
 package com.sn.data.data_sourse
 
-import com.sn.data.local.database.NoteDao
 import com.sn.data.entity.NoteEntity
 import com.sn.data.ext.toModel
+import com.sn.data.local.database.NoteDao
 import com.sn.domain.model.Note
-import com.sn.utils.Result
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -13,7 +11,7 @@ import javax.inject.Inject
 class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : LocalDataSource {
 
     private val mutex = Mutex()
-    override suspend fun getAllNotes(categoryId: Int): List<Note> = mutex.withLock {
+    override suspend fun getAllNotes(): List<Note> = mutex.withLock {
         return noteDao.getAllNotes().toModel()
     }
 

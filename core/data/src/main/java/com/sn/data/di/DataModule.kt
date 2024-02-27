@@ -5,9 +5,9 @@ import androidx.room.Room
 import com.sn.data.data_sourse.LocalDataSourceImpl
 import com.sn.data.local.database.NoteDao
 import com.sn.data.local.database.NoteDatabase
-import com.sn.data.repository.EditNoteRepositoryImpl
+import com.sn.data.repository.UpdateNoteRepositoryImpl
 import com.sn.data.repository.NotesRepositoryImpl
-import com.sn.domain.gateway.EditNoteRepository
+import com.sn.domain.gateway.UpdateNoteRepository
 import com.sn.domain.gateway.NotesRepository
 import com.sn.data.data_sourse.LocalDataSource
 import dagger.Binds
@@ -24,7 +24,7 @@ abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindEditNoteRepository(repository: EditNoteRepositoryImpl): EditNoteRepository
+    abstract fun bindEditNoteRepository(repository: UpdateNoteRepositoryImpl): UpdateNoteRepository
 
     @Singleton
     @Binds

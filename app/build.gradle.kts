@@ -94,4 +94,35 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+
+    // Dependencies for local unit tests
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.android)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.androidx.navigation.testing)
+    testImplementation(libs.espresso.core)
+    testImplementation(libs.google.truth)
+    testImplementation(libs.androidx.compose.ui.test.junit)
+
+    // Dependencies for Android unit tests
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit)
+
+    // AndroidX Test - JVM testing
+    testImplementation(libs.androidx.test.core.ktx)
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.androidx.test.rules)
+    testImplementation(project(":shared-test"))
+
+    // AndroidX Test - Instrumented testing
+    androidTestImplementation(libs.androidx.test.core.ktx)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.androidx.navigation.testing)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(project(":shared-test"))
 }

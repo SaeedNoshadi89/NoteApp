@@ -1,9 +1,6 @@
 package com.sn.domain.usecase
 
 import com.sn.domain.gateway.NotesRepository
-import com.sn.domain.model.Note
-import com.sn.utils.Result
-import kotlinx.coroutines.flow.Flow
 
 class UpsertNoteUseCase constructor(private val repository: NotesRepository) {
     suspend operator fun invoke(
@@ -12,7 +9,6 @@ class UpsertNoteUseCase constructor(private val repository: NotesRepository) {
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
-        categoryId: Int
     ) =
         repository.updateNote(
             noteId = noteId,
@@ -20,6 +16,5 @@ class UpsertNoteUseCase constructor(private val repository: NotesRepository) {
             description = description,
             dueDateTime = dueDateTime,
             isCompleted = isCompleted,
-            categoryId = categoryId
         )
 }

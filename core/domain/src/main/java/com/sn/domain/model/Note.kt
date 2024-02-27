@@ -6,5 +6,10 @@ data class Note(
     val description: String?,
     val dueDateTime: String,
     val isCompleted: Boolean = false,
-    val category: Int?
-)
+){
+    val isActive
+        get() = !isCompleted
+
+    val isEmpty
+        get() = title.isEmpty() || description?.isEmpty() == true
+}
