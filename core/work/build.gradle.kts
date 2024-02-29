@@ -2,6 +2,9 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.ksp.plugin)
+    id("kotlin-kapt")
 }
 
 android {
@@ -27,9 +30,10 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
     }
     kotlinOptions {
         jvmTarget = libs.versions.jvm.target.get()
@@ -37,7 +41,12 @@ android {
 }
 
 dependencies {
-
+    implementation(project(":core:designsystem"))
+    implementation(libs.androidx.work.ktx)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.work.compiler)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

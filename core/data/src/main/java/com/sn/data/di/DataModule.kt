@@ -2,14 +2,16 @@ package com.sn.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.sn.data.data_sourse.LocalDataSource
 import com.sn.data.data_sourse.LocalDataSourceImpl
+import com.sn.data.data_sourse.ReminderScheduler
+import com.sn.data.data_sourse.ReminderSchedulerImpl
 import com.sn.data.local.database.NoteDao
 import com.sn.data.local.database.NoteDatabase
-import com.sn.data.repository.UpdateNoteRepositoryImpl
+import com.sn.data.repository.AddAndEditNoteRepositoryImpl
 import com.sn.data.repository.NotesRepositoryImpl
-import com.sn.domain.gateway.UpdateNoteRepository
+import com.sn.domain.gateway.AddAndEditNoteRepository
 import com.sn.domain.gateway.NotesRepository
-import com.sn.data.data_sourse.LocalDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -24,11 +26,15 @@ abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindEditNoteRepository(repository: UpdateNoteRepositoryImpl): UpdateNoteRepository
+    abstract fun bindNotesRepository(repository: NotesRepositoryImpl): NotesRepository
 
     @Singleton
     @Binds
-    abstract fun bindNotesRepository(repository: NotesRepositoryImpl): NotesRepository
+    abstract fun bindAddNoteRepository(repository: AddAndEditNoteRepositoryImpl): AddAndEditNoteRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindReminderScheduler(reminderScheduler: ReminderSchedulerImpl): ReminderScheduler
 }
 
 @Module

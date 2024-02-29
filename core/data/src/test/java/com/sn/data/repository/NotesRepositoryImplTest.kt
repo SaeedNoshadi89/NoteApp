@@ -3,7 +3,7 @@ package com.sn.data.repository
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth.assertThat
 import com.sn.data.ext.toEntity
-import com.sn.domain.gateway.AddNoteRepository
+import com.sn.domain.gateway.AddAndEditNoteRepository
 import com.sn.domain.gateway.NotesRepository
 import com.sn.domain.model.Note
 import com.sn.shared_test.FakeLocalDataSource
@@ -54,7 +54,7 @@ class NotesRepositoryImplTest {
     private lateinit var noteDao: FakeNoteDao
 
     private lateinit var notesRepository: NotesRepository
-    private lateinit var addNoteRepository: AddNoteRepository
+    private lateinit var addNoteRepository: AddAndEditNoteRepository
 
     @ExperimentalCoroutinesApi
     @Before
@@ -65,7 +65,11 @@ class NotesRepositoryImplTest {
         notesRepository =
             NotesRepositoryImpl(localDataSource = localDataSource)
         addNoteRepository =
-            AddNoteRepositoryImpl(localDataSource = localDataSource, dispatcher = testDispatcher)
+            AddAndEditNoteRepositoryImpl(
+                localDataSource = localDataSource,
+                reminderScheduler = null,
+                dispatcher = testDispatcher
+            )
 
     }
 
@@ -75,7 +79,7 @@ class NotesRepositoryImplTest {
         turbineScope {
             localDataSource.deleteAllNotes()
 
-            val notes = notesRepository.getAllNotes().testIn(backgroundScope).awaitItem()
+            val notes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
             assertThat(notes.size).isEqualTo(0)
         }
     }
@@ -88,7 +92,9 @@ class NotesRepositoryImplTest {
                 addNoteRepository.createNote(
                     newNote.title,
                     newNote.description ?: "",
-                    dueDateTime = newNote.dueDateTime
+                    dueDateTime = newNote.dueDateTime,
+                    isCompleted = newNote.isCompleted,
+                    dueDate
                 )
             // Make sure it's active
             val noteIsNotComplete =
@@ -113,7 +119,9 @@ class NotesRepositoryImplTest {
                 addNoteRepository.createNote(
                     newNote.title,
                     newNote.description ?: "",
-                    dueDateTime = newNote.dueDateTime
+                    dueDateTime = newNote.dueDateTime,
+                    isCompleted = newNote.isCompleted,
+                    dueDate
                 )
 
             notesRepository.completeNote(newNoteId)
@@ -140,7 +148,7 @@ class NotesRepositoryImplTest {
 
             notesRepository.clearCompletedNotes()
 
-            val notes = notesRepository.getAllNotes().testIn(backgroundScope).awaitItem()
+            val notes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
 
             assertThat(notes).hasSize(1)
             assertThat(notes).contains(note2)
@@ -151,7 +159,7 @@ class NotesRepositoryImplTest {
     @Test
     fun deleteAllNotes() = runTest {
         turbineScope {
-            val initialNotes = notesRepository.getAllNotes().testIn(backgroundScope).awaitItem()
+            val initialNotes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
 
             // Verify notes are returned
             assertThat(initialNotes.size).isEqualTo(1)
@@ -161,7 +169,7 @@ class NotesRepositoryImplTest {
 
             // Verify notes are empty now
             val afterDeleteNotes =
-                notesRepository.getAllNotes().testIn(backgroundScope).awaitItem()
+                notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
             assertThat(afterDeleteNotes).isEmpty()
         }
     }
@@ -170,12 +178,12 @@ class NotesRepositoryImplTest {
     fun deleteANote() = runTest {
         turbineScope {
             val initialNoteSize =
-                notesRepository.getAllNotes().testIn(backgroundScope).awaitItem().size
-            notesRepository.deleteNote(note3.id)
+                notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem().size
+            note3.id?.let { notesRepository.deleteNote(it) }
 
 
             val afterDeleteNotes =
-                notesRepository.getAllNotes().testIn(backgroundScope).awaitItem()
+                notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
 
             assertThat(afterDeleteNotes.size).isEqualTo(initialNoteSize - 1)
             assertThat(afterDeleteNotes).doesNotContain(note3)

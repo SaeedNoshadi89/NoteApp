@@ -7,7 +7,7 @@ import com.sn.domain.model.Note
 
 class FakeLocalDataSource(var notes: MutableList<NoteEntity>? = mutableListOf()) :
     LocalDataSource {
-    override suspend fun getAllNotes(): List<Note> = notes?.map { it.toModel() } ?: throw Exception("Note list is null")
+    override suspend fun getAllNotes(categoryId: Int?, selectedDate: kotlinx.datetime.LocalDate?): List<Note> = notes?.map { it.toModel() } ?: throw Exception("Note list is null")
 
     override suspend fun upsertNote(note: NoteEntity) {
         notes?.add(note)

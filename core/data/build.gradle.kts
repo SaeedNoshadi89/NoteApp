@@ -41,6 +41,7 @@ android {
 
 dependencies {
     implementation(project(":core:domain"))
+    implementation(project(":core:work"))
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
@@ -48,13 +49,12 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlin.date.time)
+    implementation(libs.androidx.work.ktx)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.turbine)
-    testImplementation(libs.mockito.test)
-    testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     // Dependencies for local unit tests

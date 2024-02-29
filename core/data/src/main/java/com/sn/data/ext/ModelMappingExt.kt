@@ -4,7 +4,7 @@ import com.sn.data.entity.NoteEntity
 import com.sn.domain.model.Note
 
 fun Note.toEntity() = NoteEntity(
-    id = id,
+    id = id ?: "0",
     title = title,
     description = description,
     isCompleted = isCompleted,

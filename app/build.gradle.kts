@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.ksp.plugin)
+    id("kotlin-kapt")
     kotlin(libs.plugins.serialization.plugin.get().pluginId) version (libs.plugins.serialization.plugin.get().version.requiredVersion)
 }
 
@@ -39,9 +40,10 @@ android {
             isDebuggable = false
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
     }
     kotlinOptions {
         jvmTarget = libs.versions.jvm.target.get()
@@ -63,11 +65,10 @@ android {
 dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
-    implementation(project(":core:notification"))
     implementation(project(":core:work"))
+    implementation(project(":core:designsystem"))
     implementation(project(":features:notes"))
-    implementation(project(":features:edit-note"))
-    implementation(project(":features:edit-note"))
+    implementation(project(":features:add-edit-note"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
@@ -86,7 +87,10 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.compose.navigation)
     implementation(libs.canary.leack)
-    ksp(libs.hilt.compiler)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.work.ktx)
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.work.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -98,7 +98,7 @@ class NoteDaoTest {
         database.noteDao().upsertNote(note)
 
         // WHEN - Get notes from the database
-        val notes = database.noteDao().getAllNotes()
+        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
 
         // THEN - There is only 1 note in the database, and contains the expected values
         assertEquals(1, notes.size)
@@ -181,7 +181,7 @@ class NoteDaoTest {
         database.noteDao().deleteById(note.id)
 
         // THEN - The list is empty
-        val notes = database.noteDao().getAllNotes()
+        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
         assertEquals(true, notes.isEmpty())
     }
 
@@ -202,7 +202,7 @@ class NoteDaoTest {
         database.noteDao().deleteAll()
 
         // THEN - The list is empty
-        val notes = database.noteDao().getAllNotes()
+        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
         assertEquals(true, notes.isEmpty())
     }
 
@@ -223,7 +223,7 @@ class NoteDaoTest {
         database.noteDao().deleteCompleted()
 
         // THEN - The list is empty
-        val notes = database.noteDao().getAllNotes()
+        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
         assertEquals(true, notes.isEmpty())
     }
 }

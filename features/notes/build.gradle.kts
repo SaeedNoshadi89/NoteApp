@@ -29,9 +29,10 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
     }
     kotlinOptions {
         jvmTarget = libs.versions.jvm.target.get()
@@ -52,6 +53,7 @@ android {
 
 dependencies {
     implementation(project(":core:domain"))
+    implementation(project(":core:designsystem"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
@@ -64,6 +66,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.compose.material)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.kotlin.date.time)
     implementation(libs.hilt.android)
