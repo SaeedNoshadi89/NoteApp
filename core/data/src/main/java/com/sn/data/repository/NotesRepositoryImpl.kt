@@ -1,25 +1,26 @@
 package com.sn.data.repository
 
-import com.sn.data.di.DefaultDispatcher
-import com.sn.domain.gateway.NotesRepository
+import com.sn.data.data_sourse.CalendarDataSource
+import com.sn.data.data_sourse.LocalData
 import com.sn.data.data_sourse.LocalDataSource
-import com.sn.data.ext.toEntity
 import com.sn.data.ext.toModel
+import com.sn.domain.gateway.NotesRepository
+import com.sn.domain.model.CalendarUiModel
+import com.sn.domain.model.Category
 import com.sn.domain.model.Note
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
-import java.util.UUID
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 class NotesRepositoryImpl @Inject constructor(
     private val localDataSource: LocalDataSource,
+    private val calendarDataSource: CalendarDataSource
 ) : NotesRepository {
 
-    override suspend fun getAllNotes(): Flow<List<Note>> = flow {
-        emit(localDataSource.getAllNotes())
+    override fun getAllNotes(categoryId: Int?): Flow<List<Note>> = flow {
+        emit(localDataSource.getAllNotes(categoryId))
     }
 
     override fun getNoteById(noteId: String): Flow<Note?> = flow {
@@ -65,5 +66,21 @@ class NotesRepositoryImpl @Inject constructor(
     override suspend fun deleteAllNotes() {
         localDataSource.deleteAllNotes()
     }
+
+    override fun getCalendar(
+        startDate: LocalDate,
+        lastSelectedDate: LocalDate
+    ): Flow<CalendarUiModel> = flowOf(
+        calendarDataSource.getData(
+            startDate = startDate,
+            lastSelectedDate = lastSelectedDate
+        )
+    )
+
+    override fun setDateToCalendar(date: LocalDate): Flow<CalendarUiModel> =
+        flowOf(calendarDataSource.getData(lastSelectedDate = date))
+
+    override fun getCategories(): Flow<List<Category>> = flowOf(LocalData.category)
+
 
 }

@@ -3,7 +3,7 @@ package com.sn.data.repository
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth.assertThat
 import com.sn.data.ext.toEntity
-import com.sn.domain.gateway.AddNoteRepository
+import com.sn.domain.gateway.AddAndEditNoteRepository
 import com.sn.domain.gateway.NotesRepository
 import com.sn.domain.model.Note
 import com.sn.shared_test.FakeLocalDataSource
@@ -23,14 +23,16 @@ class AddNoteRepositoryImplTest {
         dueDateTime = "123456",
         isCompleted = false
     )
+    private val updatedTitle = "updated title"
+    private val updatedDesc = "updated desc"
+    private val updatedDueDateTime = "1234567"
 
     private val localNotes = listOf(note.toEntity())
-    private var testDispatcher = UnconfinedTestDispatcher()
     private lateinit var localDataSource: FakeLocalDataSource
     private lateinit var noteDao: FakeNoteDao
-
+    private var testDispatcher = UnconfinedTestDispatcher()
     private lateinit var notesRepository: NotesRepository
-    private lateinit var addNoteRepository: AddNoteRepository
+    private lateinit var addNoteRepository: AddAndEditNoteRepository
 
     @ExperimentalCoroutinesApi
     @Before
@@ -40,8 +42,13 @@ class AddNoteRepositoryImplTest {
         // Get a reference to the class under test
         notesRepository =
             NotesRepositoryImpl(localDataSource = localDataSource)
+
         addNoteRepository =
-            AddNoteRepositoryImpl(localDataSource = localDataSource, dispatcher = testDispatcher)
+            AddAndEditNoteRepositoryImpl(
+                localDataSource = localDataSource,
+                reminderScheduler = null,
+                dispatcher = testDispatcher
+            )
 
     }
 
@@ -50,17 +57,52 @@ class AddNoteRepositoryImplTest {
     fun addANote_getNotesCache() = runTest {
         turbineScope {
             // get all notes before create a new
-            val oldNotes = notesRepository.getAllNotes().testIn(backgroundScope).awaitItem()
+            val oldNotes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
             assertThat(oldNotes.size).isEqualTo(1)
             //Save a note
             addNoteRepository.createNote(
                 title = "new title",
                 description = "new description",
-                dueDateTime = "1234567"
+                dueDateTime = "1234567",
+                isCompleted = false,
+                dueDate = dueDate
             )
 
-            val newNotes = notesRepository.getAllNotes().testIn(backgroundScope).awaitItem()
+            val newNotes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
             assertThat(newNotes.size).isEqualTo(2)
+        }
+    }
+
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun getNotesById_UpdateNoteInCache() = runTest {
+        turbineScope {
+            // Save a note
+            val newNoteId =
+                addNoteRepository.createNote(
+                    title = note.title,
+                    description = note.description ?: "",
+                    dueDateTime = note.dueDateTime,
+                    isCompleted = note.isCompleted,
+                    dueDate = dueDate
+                )
+
+            // Update the note
+            addNoteRepository.updateNote(
+                noteId = newNoteId,
+                title = updatedTitle,
+                description = updatedDesc,
+                dueDateTime = updatedDueDateTime,
+                isCompleted = note.isCompleted
+            )
+            // Get a note by id after update
+            val noteAfterUpdate =
+                notesRepository.getNoteById(newNoteId).testIn(backgroundScope).awaitItem()
+            assertThat(noteAfterUpdate?.title).isEqualTo(updatedTitle)
+            assertThat(noteAfterUpdate?.description).isEqualTo(updatedDesc)
+            assertThat(noteAfterUpdate?.dueDateTime).isEqualTo(updatedDueDateTime)
+            assertThat(noteAfterUpdate?.isCompleted).isEqualTo(note.isCompleted)
         }
     }
 }

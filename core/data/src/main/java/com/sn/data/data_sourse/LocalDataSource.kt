@@ -4,7 +4,7 @@ import com.sn.data.entity.NoteEntity
 import com.sn.domain.model.Note
 
 interface LocalDataSource {
-    suspend fun getAllNotes(): List<Note>
+    suspend fun getAllNotes(categoryId: Int?): List<Note>
 
     suspend fun upsertNote(note: NoteEntity)
 

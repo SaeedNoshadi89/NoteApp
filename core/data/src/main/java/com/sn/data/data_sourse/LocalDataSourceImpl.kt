@@ -11,8 +11,8 @@ import javax.inject.Inject
 class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : LocalDataSource {
 
     private val mutex = Mutex()
-    override suspend fun getAllNotes(): List<Note> = mutex.withLock {
-        return noteDao.getAllNotes().toModel()
+    override suspend fun getAllNotes(categoryId: Int?): List<Note> = mutex.withLock {
+        return noteDao.getAllNotes(categoryId).toModel()
     }
 
     override suspend fun upsertNote(note: NoteEntity) = mutex.withLock {

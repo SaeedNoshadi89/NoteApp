@@ -8,11 +8,11 @@ android {
     namespace = "com.sn.benchmark"
     compileSdk = libs.versions.compile.sdk.get().toInt()
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
     }
-
     kotlinOptions {
         jvmTarget = libs.versions.jvm.target.get()
     }

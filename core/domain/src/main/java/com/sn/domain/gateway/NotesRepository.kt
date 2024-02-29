@@ -1,11 +1,14 @@
 package com.sn.domain.gateway
 
+import com.sn.domain.model.CalendarUiModel
+import com.sn.domain.model.Category
 import com.sn.domain.model.Note
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDate
 
 interface NotesRepository {
 
-    suspend fun getAllNotes(): Flow<List<Note>>
+    fun getAllNotes(categoryId: Int?): Flow<List<Note>>
 
     fun getNoteById(noteId: String): Flow<Note?>
 
@@ -26,4 +29,9 @@ interface NotesRepository {
     suspend fun clearCompletedNotes()
 
     suspend fun deleteAllNotes()
+
+    fun getCalendar(startDate: LocalDate, lastSelectedDate: LocalDate): Flow<CalendarUiModel>
+    fun setDateToCalendar(date: LocalDate): Flow<CalendarUiModel>
+
+    fun getCategories(): Flow<List<Category>>
 }
