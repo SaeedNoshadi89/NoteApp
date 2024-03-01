@@ -6,10 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.sn.core.Dispatcher
 import com.sn.core.generateDueDateTime
 import com.sn.core.getFormattedDateTime
+import com.sn.domain.gateway.AddAndEditNoteRepository
+import com.sn.domain.model.Category
 import com.sn.domain.model.Note
 import com.sn.domain.model.TimeModel
 import com.sn.domain.usecase.AddNoteUseCase
 import com.sn.domain.usecase.GetNoteByIdUseCase
+import com.sn.domain.usecase.UpdateNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -27,24 +30,28 @@ import javax.inject.Inject
 class AddNoteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val addNoteUseCase: AddNoteUseCase,
+    private val updateNoteUseCase: UpdateNoteUseCase,
     private val getNoteByIdUseCase: GetNoteByIdUseCase,
     @Dispatcher(com.sn.core.Dispatchers.IO)
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val repository: AddAndEditNoteRepository
 ) :
     ViewModel() {
     private val noteId = savedStateHandle["idArg"] ?: ""
 
-    init {
-        if (noteId.isNotEmpty()) {
-            getNote()
-        }
-    }
 
     private val viewModelState = MutableStateFlow(
         AddNoteViewModelState(
             isLoading = true,
         )
     )
+
+    init {
+        if (noteId.isNotEmpty()) {
+            getNote()
+        }
+        getCategories()
+    }
 
     val uiState = viewModelState.map(AddNoteViewModelState::toUiState).stateIn(
         scope = viewModelScope,
@@ -66,9 +73,8 @@ class AddNoteViewModel @Inject constructor(
                                 formattedDateTime.time.hour,
                                 formattedDateTime.time.minute
                             ),
-                            title = "Edit Note",
+                            selectedCategory = viewModelState.value.categories.find { category -> category.id == note.category },
                             actionMessage = "Updated",
-                            buttonText = "Edit"
                         )
                     }
                 }
@@ -91,28 +97,27 @@ class AddNoteViewModel @Inject constructor(
     fun addNote() {
         viewModelScope.launch(ioDispatcher) {
             tryGenerateDueDateTime()
-            if (viewModelState.value.note.title.isEmpty()) {
-                viewModelState.update {
-                    it.copy(
-                        error = "title is empty"
-                    )
-                }
-                return@launch
+            if (validationData()) return@launch
+
+            val id = if (noteId.isEmpty()) {
+                addNoteUseCase(
+                    title = viewModelState.value.note.title,
+                    description = viewModelState.value.note.description ?: "",
+                    dueDateTime = viewModelState.value.note.dueDateTime,
+                    isCompleted = false,
+                    category = viewModelState.value.selectedCategory?.id ?: 1
+                )
+            } else {
+                updateNoteUseCase(
+                    noteId = noteId,
+                    title = viewModelState.value.note.title,
+                    description = viewModelState.value.note.description ?: "",
+                    dueDateTime = viewModelState.value.note.dueDateTime,
+                    isCompleted = viewModelState.value.note.isCompleted,
+                    category = viewModelState.value.selectedCategory?.id ?: 1
+                )
+                noteId
             }
-            if (viewModelState.value.note.dueDateTime.isEmpty()) {
-                viewModelState.update {
-                    it.copy(
-                        error = "you have to add a date and time"
-                    )
-                }
-                return@launch
-            }
-            val id = addNoteUseCase(
-                title = viewModelState.value.note.title,
-                description = viewModelState.value.note.description ?: "",
-                dueDateTime = viewModelState.value.note.dueDateTime,
-                isCompleted = false
-            )
             if (id.isNotEmpty()) {
                 viewModelState.update {
                     it.copy(
@@ -126,6 +131,26 @@ class AddNoteViewModel @Inject constructor(
         }
     }
 
+    private fun validationData(): Boolean {
+        if (viewModelState.value.note.title.isEmpty()) {
+            viewModelState.update {
+                it.copy(
+                    error = "title is empty"
+                )
+            }
+            return true
+        }
+        if (viewModelState.value.note.dueDateTime.isEmpty()) {
+            viewModelState.update {
+                it.copy(
+                    error = "you have to add a date and time"
+                )
+            }
+            return true
+        }
+        return false
+    }
+
     private fun tryGenerateDueDateTime() {
         viewModelState.value.dueDate?.generateDueDateTime(
             hour = viewModelState.value.dueTime.hour,
@@ -133,6 +158,23 @@ class AddNoteViewModel @Inject constructor(
         )?.let { dueDateTime ->
             viewModelState.update { it.copy(note = viewModelState.value.note.copy(dueDateTime = dueDateTime)) }
         }
+    }
+
+    private fun getCategories() {
+        viewModelScope.launch(ioDispatcher) {
+            repository.getCategories().collectLatest { result ->
+                viewModelState.update {
+                    it.copy(
+                        categories = result,
+                        selectedCategory = result[0]
+                    )
+                }
+            }
+        }
+    }
+
+    fun selectCategory(category: Category) {
+        viewModelState.update { it.copy(selectedCategory = category) }
     }
 
 }
@@ -146,9 +188,9 @@ sealed interface AddNoteUiState {
         val createOrUpdateNoteStatus: Boolean,
         val dueTime: TimeModel,
         val dueDate: LocalDate?,
-        val title: String,
         val actionMessage: String,
-        val buttonText: String,
+        val categories: List<Category>,
+        val selectedCategory: Category?,
         override val isLoading: Boolean,
         override val error: String
     ) : AddNoteUiState
@@ -158,11 +200,11 @@ data class AddNoteViewModelState(
     val isLoading: Boolean = false,
     val error: String = "",
     val note: Note = Note(),
-    val title: String = "Add Note",
     val actionMessage: String = "",
-    val buttonText: String = "Add",
     val dueTime: TimeModel = TimeModel(),
     val dueDate: LocalDate? = null,
+    val categories: List<Category> = emptyList(),
+    val selectedCategory: Category? = null,
     val createOrUpdateNoteStatus: Boolean = false,
 ) {
     fun toUiState(): AddNoteUiState =
@@ -172,9 +214,9 @@ data class AddNoteViewModelState(
             note = note,
             dueTime = dueTime,
             dueDate = dueDate,
-            title = title,
             actionMessage = actionMessage,
-            buttonText = buttonText,
-            createOrUpdateNoteStatus = createOrUpdateNoteStatus
+            createOrUpdateNoteStatus = createOrUpdateNoteStatus,
+            categories = categories,
+            selectedCategory = selectedCategory
         )
 }

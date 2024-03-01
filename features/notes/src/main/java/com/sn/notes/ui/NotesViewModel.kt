@@ -9,6 +9,9 @@ import com.sn.domain.gateway.NotesRepository
 import com.sn.domain.model.CalendarUiModel
 import com.sn.domain.model.Category
 import com.sn.domain.model.Note
+import com.sn.domain.usecase.ActiveNoteUseCase
+import com.sn.domain.usecase.CompleteNoteUseCase
+import com.sn.domain.usecase.DeleteNoteUseCase
 import com.sn.domain.usecase.GetAllNotesUseCase
 import com.sn.domain.usecase.GetCalendarUseCase
 import com.sn.domain.usecase.SetDateToCalendarUseCase
@@ -34,6 +37,9 @@ class NotesViewModel @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val getCalendarUseCase: GetCalendarUseCase,
     private val setDateToCalendarUseCase: SetDateToCalendarUseCase,
+    private val completeNoteUseCase: CompleteNoteUseCase,
+    private val activeNoteUseCase: ActiveNoteUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase,
     private val repository: NotesRepository
 ) :
     ViewModel() {
@@ -105,6 +111,39 @@ class NotesViewModel @Inject constructor(
     fun selectCategory(category: Category) {
         viewModelState.update { it.copy(selectedCategory = category) }
         getNotes()
+    }
+
+    fun completeNote(noteId: String?){
+        viewModelScope.launch(ioDispatcher) {
+            noteId?.let {id ->
+                completeNoteUseCase(
+                    noteId = id,
+                )
+            }
+            getNotes()
+        }
+    }
+
+    fun activeNote(noteId: String?){
+        viewModelScope.launch(ioDispatcher) {
+            noteId?.let {id ->
+                activeNoteUseCase(
+                    noteId = id,
+                )
+            }
+            getNotes()
+        }
+    }
+
+    fun deleteNote(noteId: String?){
+        viewModelScope.launch(ioDispatcher) {
+            noteId?.let {id ->
+                deleteNoteUseCase(
+                    noteId = id,
+                )
+            }
+            getNotes()
+        }
     }
 
 }

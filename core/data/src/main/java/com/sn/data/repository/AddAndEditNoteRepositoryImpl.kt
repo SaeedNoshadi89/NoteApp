@@ -1,16 +1,20 @@
 package com.sn.data.repository
 
+import android.util.Log
 import com.sn.core.getDelayInMilliseconds
+import com.sn.data.data_sourse.LocalData
 import com.sn.data.data_sourse.LocalDataSource
 import com.sn.data.data_sourse.ReminderScheduler
 import com.sn.data.di.DefaultDispatcher
 import com.sn.data.ext.toEntity
 import com.sn.data.ext.toModel
 import com.sn.domain.gateway.AddAndEditNoteRepository
+import com.sn.domain.model.Category
 import com.sn.domain.model.Note
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import java.util.UUID
@@ -26,6 +30,7 @@ class AddAndEditNoteRepositoryImpl @Inject constructor(
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
+        category: Int,
     ): String {
 
         val noteId = withContext(dispatcher) {
@@ -37,14 +42,16 @@ class AddAndEditNoteRepositoryImpl @Inject constructor(
             id = noteId,
             dueDateTime = dueDateTime,
             isCompleted = isCompleted,
+            category = category
         )
 
-        if (dueDateTime.isNotEmpty()){
+        if (dueDateTime.isNotEmpty()) {
             reminderScheduler?.scheduleReminder(
                 dueDateTime = getDelayInMilliseconds(
                     dueDateTime.toLong(),
                     Clock.System.now()
-                ), noteTitle = title, noteDescription = description
+                ), noteTitle = title,
+                noteDescription = description
             )
         }
 
@@ -62,6 +69,7 @@ class AddAndEditNoteRepositoryImpl @Inject constructor(
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
+        category: Int,
     ) {
         val note = Note(
             title = title,
@@ -69,9 +77,12 @@ class AddAndEditNoteRepositoryImpl @Inject constructor(
             id = noteId,
             dueDateTime = dueDateTime,
             isCompleted = isCompleted,
+            category = category
         )
 
         localDataSource.upsertNote(note.toEntity())
     }
+
+    override fun getCategories(): Flow<List<Category>> = flowOf(LocalData.category)
 
 }

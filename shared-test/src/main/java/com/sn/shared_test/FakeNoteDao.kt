@@ -17,7 +17,14 @@ class FakeNoteDao(initialNotes: List<NoteEntity>? = emptyList()) : NoteDao {
         notes = initialNotes
     }
 
-    override fun getAllNotes(categoryId: Int?, selectedDate: kotlinx.datetime.LocalDate?): List<NoteEntity> = notes ?: throw Exception("Note list is null")
+    override fun getAllNotes(): List<NoteEntity> = notes ?: throw Exception("Note list is null")
+
+    override fun getNotes(categoryId: Int?): List<NoteEntity> {
+        return notes?.filter {
+            it.category == categoryId
+        } ?: emptyList()
+    }
+
 
     override fun getNoteById(noteId: String): NoteEntity? = _notes?.get(noteId)
 

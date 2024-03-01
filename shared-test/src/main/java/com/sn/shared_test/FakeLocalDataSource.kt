@@ -7,10 +7,17 @@ import com.sn.domain.model.Note
 
 class FakeLocalDataSource(var notes: MutableList<NoteEntity>? = mutableListOf()) :
     LocalDataSource {
-    override suspend fun getAllNotes(categoryId: Int?, selectedDate: kotlinx.datetime.LocalDate?): List<Note> = notes?.map { it.toModel() } ?: throw Exception("Note list is null")
+    override suspend fun getAllNotes(categoryId: Int?): List<Note> =
+        notes?.map { it.toModel() } ?: throw Exception("Note list is null")
+
 
     override suspend fun upsertNote(note: NoteEntity) {
-        notes?.add(note)
+        val existingIndex = notes?.indexOfFirst { it.id == note.id }
+        if (existingIndex != null && existingIndex != -1) {
+            notes?.set(existingIndex, note)
+        } else {
+            notes?.add(note)
+        }
     }
 
     override suspend fun deleteNote(noteId: String): Int {
@@ -39,7 +46,7 @@ class FakeLocalDataSource(var notes: MutableList<NoteEntity>? = mutableListOf())
     }
 
     override suspend fun clearCompletedNotes(): Int {
-       notes?.removeIf { it.isCompleted }
+        notes?.removeIf { it.isCompleted }
         return 1
     }
 

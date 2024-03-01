@@ -1,37 +1,43 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.sn.add_note.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sn.add_note.ui.component.CategorySection
+import com.sn.add_note.ui.component.Header
+import com.sn.add_note.ui.component.ModalSection
 import com.sn.designsystem.component.component.DatePickerInDatePickerDialog
+import com.sn.designsystem.component.component.NoteBasicTextField
 import com.sn.designsystem.component.component.TimePickerWithDialog
 import com.sn.domain.model.TimeModel
 import kotlinx.coroutines.launch
@@ -48,13 +54,14 @@ fun AddEditNoteScreen(
     viewModel: AddNoteViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
+    val scrollState = rememberScrollState()
     val openDatePicker = remember {
         mutableStateOf(false)
     }
-
+    var showTimePicker = remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showBottomSheet by remember { mutableStateOf(true) }
     when (val uiState = state) {
         is AddNoteUiState.Data -> {
             LaunchedEffect(key1 = uiState.createOrUpdateNoteStatus) {
@@ -70,113 +77,129 @@ fun AddEditNoteScreen(
                     }
                 }
             }
-            Column(
-                modifier = modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Top
-            ) {
-                CenterAlignedTopAppBar(
-                    title = { Text(text = uiState.title) },
-                    navigationIcon = {
-                        Icon(
-                            modifier = modifier.clickable { onBack() },
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "back"
-                        )
-                    }
-                )
+            BoxWithConstraints {
+                val maxHeight = maxHeight
                 Column(
                     modifier = modifier
                         .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(16.dp)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(40.dp)
                 ) {
-                    OutlinedTextField(
-                        modifier = modifier.fillMaxWidth(),
-                        value = uiState.note.title,
-                        onValueChange = { viewModel.updateNote(uiState.note.copy(title = it)) },
-                        placeholder = {
-                            Text(
-                                text = "Enter title"
-                            )
-                        })
-                    OutlinedTextField(
-                        modifier = modifier.fillMaxWidth(),
-                        value = uiState.note.description ?: "",
-                        onValueChange = { viewModel.updateNote(uiState.note.copy(description = it)) },
-                        placeholder = {
-                            Text(
-                                text = "Enter description"
-                            )
-                        })
-                    Column(
-                        modifier = modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
+                    Header(onBack = onBack, onSave = { viewModel.addNote() })
+                    CategorySection(uiState = uiState) {
+                        viewModel.selectCategory(it)
+                    }
 
-                        Button(onClick = { openDatePicker.value = true }) {
-                            Text(
-                                text = "Select date ${uiState.dueDate ?: ""}",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontSize = 17.sp
-                                ),
+                    Surface(
+                        modifier = modifier.weight(1f),
+                        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                        color = MaterialTheme.colorScheme.background,
+                        shadowElevation = 4.dp
+                    ) {
+                        Column(
+                            modifier = modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            NoteBasicTextField(
+                                value = uiState.note.title,
+                                updateTextValue = { viewModel.updateNote(uiState.note.copy(title = it)) },
+                                textStyle = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                                placeholder = "Enter title",
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             )
-                        }
-                        DatePickerInDatePickerDialog(
-                            openDialog = openDatePicker.value,
-                            onDismiss = { openDatePicker.value = false },
-                            selectedDate = { date ->
-                                date?.let {
-                                    if (Instant.fromEpochMilliseconds(it)
-                                            .toLocalDateTime(TimeZone.currentSystemDefault()).date < Clock.System.now()
-                                            .toLocalDateTime(
-                                                TimeZone.currentSystemDefault()
-                                            ).date
-                                    ) {
-                                        scope.launch {
-                                            onShowSnackbar("Date is not valid")
-                                        }
-                                        return@let
-                                    }
-                                    viewModel.updateDueDate(
-                                        Instant.fromEpochMilliseconds(it)
-                                            .toLocalDateTime(
-                                                TimeZone.currentSystemDefault()
-                                            ).date
+
+                            NoteBasicTextField(
+                                value = uiState.note.description ?: "",
+                                updateTextValue = {
+                                    viewModel.updateNote(
+                                        uiState.note.copy(
+                                            description = it
+                                        )
                                     )
-                                    scope.launch {
-                                        onShowSnackbar("Date is selected")
-                                    }
-                                }
-                            })
-                    }
-                    Column(
-                        modifier = modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        TimePickerWithDialog(timePickerState = {
-                            viewModel.updateDueTime(time = TimeModel(it.hour, it.minute))
-                        })
+                                },
+                                textStyle = MaterialTheme.typography.labelLarge.copy(fontSize = 13.sp),
+                                placeholder = "Enter description",
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            )
 
-                    }
-                    Box(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .padding(horizontal = 30.dp), contentAlignment = Alignment.Center
-                    ) {
-                        Button(modifier = modifier.fillMaxWidth(), onClick = {
-                            viewModel.addNote()
-                        }) {
-                            Text(text = uiState.buttonText)
+                            Column(
+                                modifier = modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                DatePickerInDatePickerDialog(
+                                    openDialog = openDatePicker.value,
+                                    onDismiss = { openDatePicker.value = false },
+                                    selectedDate = { date ->
+                                        date?.let {
+                                            if (Instant.fromEpochMilliseconds(it)
+                                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date < Clock.System.now()
+                                                    .toLocalDateTime(
+                                                        TimeZone.currentSystemDefault()
+                                                    ).date
+                                            ) {
+                                                scope.launch {
+                                                    onShowSnackbar("Date is not valid")
+                                                }
+                                                return@let
+                                            }
+                                            viewModel.updateDueDate(
+                                                Instant.fromEpochMilliseconds(it)
+                                                    .toLocalDateTime(
+                                                        TimeZone.currentSystemDefault()
+                                                    ).date
+                                            )
+                                            scope.launch {
+                                                onShowSnackbar("Date is selected")
+                                            }
+                                        }
+                                    })
+                            }
+                            Column(
+                                modifier = modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                TimePickerWithDialog(
+                                    showTimePicker = showTimePicker.value,
+                                    timePickerState = {
+                                        viewModel.updateDueTime(
+                                            time = TimeModel(
+                                                it.hour,
+                                                it.minute
+                                            )
+                                        )
+                                    },
+                                    onDismiss = { showTimePicker.value = false })
+
+                            }
                         }
+                    }
+
+
+                }
+                if (showBottomSheet) {
+                    ModalBottomSheet(
+                        modifier = modifier
+                            .heightIn(max = maxHeight.div(3f))
+                            .safeDrawingPadding(),
+                        onDismissRequest = {
+                            showBottomSheet = false
+                        },
+                        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                        sheetState = sheetState,
+                    ) {
+                        ModalSection(
+                            uiState = uiState,
+                            onPickDate = { openDatePicker.value = true },
+                            onPickTime = { showTimePicker.value = true })
                     }
                 }
             }
-
         }
     }
 }

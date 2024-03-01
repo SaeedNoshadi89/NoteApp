@@ -12,7 +12,9 @@ class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : Lo
 
     private val mutex = Mutex()
     override suspend fun getAllNotes(categoryId: Int?): List<Note> = mutex.withLock {
-        return noteDao.getAllNotes(categoryId).toModel()
+        return if (categoryId == 1) noteDao.getAllNotes().toModel() else noteDao.getNotes(
+            categoryId
+        ).toModel()
     }
 
     override suspend fun upsertNote(note: NoteEntity) = mutex.withLock {

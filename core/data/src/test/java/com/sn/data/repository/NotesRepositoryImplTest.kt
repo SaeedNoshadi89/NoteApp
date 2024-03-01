@@ -2,10 +2,12 @@ package com.sn.data.repository
 
 import app.cash.turbine.turbineScope
 import com.google.common.truth.Truth.assertThat
+import com.sn.data.data_sourse.CalendarDataSource
 import com.sn.data.ext.toEntity
 import com.sn.domain.gateway.AddAndEditNoteRepository
 import com.sn.domain.gateway.NotesRepository
 import com.sn.domain.model.Note
+import com.sn.shared_test.FakeCalendarDataSource
 import com.sn.shared_test.FakeLocalDataSource
 import com.sn.shared_test.FakeNoteDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,21 +24,24 @@ class NotesRepositoryImplTest {
         title = "Title1",
         description = "Description1",
         dueDateTime = "123456",
-        isCompleted = false
+        isCompleted = false,
+        category = 1
     )
     private val note2 = Note(
         id = "2",
         title = "Title2",
         description = "Description2",
         dueDateTime = "1234567",
-        isCompleted = false
+        isCompleted = false,
+        category = 1
     )
     private val note3 = Note(
         id = "3",
         title = "Title3",
         description = "Description3",
         dueDateTime = "12345678",
-        isCompleted = false
+        isCompleted = false,
+        category = 1
     )
 
     private val newNoteTitle = "Title new"
@@ -46,24 +51,28 @@ class NotesRepositoryImplTest {
         title = newNoteTitle,
         description = newNoteDescription,
         dueDateTime = "",
-        isCompleted = false
+        isCompleted = false,
+        category = 1
     )
     private val localNotes = listOf(note3.toEntity())
     private var testDispatcher = UnconfinedTestDispatcher()
     private lateinit var localDataSource: FakeLocalDataSource
+    private lateinit var calendarDataSource: CalendarDataSource
     private lateinit var noteDao: FakeNoteDao
 
     private lateinit var notesRepository: NotesRepository
     private lateinit var addNoteRepository: AddAndEditNoteRepository
 
+
     @ExperimentalCoroutinesApi
     @Before
     fun initRepository() {
         localDataSource = FakeLocalDataSource(localNotes.toMutableList())
+        calendarDataSource = FakeCalendarDataSource()
         noteDao = FakeNoteDao(localNotes)
         // Get a reference to the class under test
         notesRepository =
-            NotesRepositoryImpl(localDataSource = localDataSource)
+            NotesRepositoryImpl(localDataSource = localDataSource, calendarDataSource)
         addNoteRepository =
             AddAndEditNoteRepositoryImpl(
                 localDataSource = localDataSource,
@@ -79,7 +88,7 @@ class NotesRepositoryImplTest {
         turbineScope {
             localDataSource.deleteAllNotes()
 
-            val notes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
+            val notes = notesRepository.getAllNotes(categoryId = 1, selectedDate = null).testIn(backgroundScope).awaitItem()
             assertThat(notes.size).isEqualTo(0)
         }
     }
@@ -94,7 +103,7 @@ class NotesRepositoryImplTest {
                     newNote.description ?: "",
                     dueDateTime = newNote.dueDateTime,
                     isCompleted = newNote.isCompleted,
-                    dueDate
+                    category = newNote.category,
                 )
             // Make sure it's active
             val noteIsNotComplete =
@@ -121,7 +130,7 @@ class NotesRepositoryImplTest {
                     newNote.description ?: "",
                     dueDateTime = newNote.dueDateTime,
                     isCompleted = newNote.isCompleted,
-                    dueDate
+                    category = newNote.category,
                 )
 
             notesRepository.completeNote(newNoteId)
@@ -148,7 +157,7 @@ class NotesRepositoryImplTest {
 
             notesRepository.clearCompletedNotes()
 
-            val notes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
+            val notes = notesRepository.getAllNotes(1, null).testIn(backgroundScope).awaitItem()
 
             assertThat(notes).hasSize(1)
             assertThat(notes).contains(note2)
@@ -159,7 +168,7 @@ class NotesRepositoryImplTest {
     @Test
     fun deleteAllNotes() = runTest {
         turbineScope {
-            val initialNotes = notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
+            val initialNotes = notesRepository.getAllNotes(1, null).testIn(backgroundScope).awaitItem()
 
             // Verify notes are returned
             assertThat(initialNotes.size).isEqualTo(1)
@@ -169,7 +178,7 @@ class NotesRepositoryImplTest {
 
             // Verify notes are empty now
             val afterDeleteNotes =
-                notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
+                notesRepository.getAllNotes(1, null).testIn(backgroundScope).awaitItem()
             assertThat(afterDeleteNotes).isEmpty()
         }
     }
@@ -178,12 +187,12 @@ class NotesRepositoryImplTest {
     fun deleteANote() = runTest {
         turbineScope {
             val initialNoteSize =
-                notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem().size
+                notesRepository.getAllNotes(1, null).testIn(backgroundScope).awaitItem().size
             note3.id?.let { notesRepository.deleteNote(it) }
 
 
             val afterDeleteNotes =
-                notesRepository.getAllNotes(categoryId, selectedDate).testIn(backgroundScope).awaitItem()
+                notesRepository.getAllNotes(1, null).testIn(backgroundScope).awaitItem()
 
             assertThat(afterDeleteNotes.size).isEqualTo(initialNoteSize - 1)
             assertThat(afterDeleteNotes).doesNotContain(note3)

@@ -1,5 +1,6 @@
 package com.sn.domain.gateway
 
+import com.sn.domain.model.Category
 import com.sn.domain.model.Note
 import kotlinx.coroutines.flow.Flow
 
@@ -11,6 +12,7 @@ interface AddAndEditNoteRepository {
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
+        category: Int,
     ): String
 
     suspend fun getNoteById(noteId: String): Flow<Note?>
@@ -21,6 +23,7 @@ interface AddAndEditNoteRepository {
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
+        category: Int,
     )
 
-}
+    fun getCategories(): Flow<List<Category>>}

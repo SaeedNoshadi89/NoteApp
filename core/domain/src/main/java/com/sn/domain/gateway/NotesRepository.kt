@@ -8,7 +8,7 @@ import kotlinx.datetime.LocalDate
 
 interface NotesRepository {
 
-    fun getAllNotes(categoryId: Int?): Flow<List<Note>>
+    fun getAllNotes(categoryId: Int?, selectedDate: LocalDate?): Flow<List<Note>>
 
     fun getNoteById(noteId: String): Flow<Note?>
 

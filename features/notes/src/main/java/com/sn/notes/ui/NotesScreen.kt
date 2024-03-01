@@ -66,7 +66,6 @@ fun NotesScreen(
 ) {
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val scrollState = rememberScrollState()
     val lazyCalendarListState = rememberLazyListState()
 
     LaunchedEffect(key1 = Unit) {
@@ -95,7 +94,7 @@ fun NotesScreen(
                         val finalStartDate = uiState.selectedDate?.plus(1, DateTimeUnit.DAY)
                         viewModel.selectDate(finalStartDate)
                     })
-                CategoryComponent(modifier, uiState){
+                CategoryComponent(modifier, uiState) {
                     viewModel.selectCategory(it)
                 }
                 RecentAllNoteHeader(modifier)
@@ -114,10 +113,16 @@ fun NotesScreen(
                                 rows = GridCells.Fixed(2),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 contentPadding = PaddingValues(8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 items(uiState.notes, key = { it.id ?: "0" }) { note ->
-                                    NoteRow(modifier, note, onEditNote)
+                                    NoteRow(
+                                        modifier = modifier,
+                                        note = note,
+                                        onEditNote = onEditNote,
+                                        onCompleteNote = { viewModel.completeNote(it) },
+                                        onActiveNote = { viewModel.activeNote(it) },
+                                        onDeleteNote = { viewModel.deleteNote(it) })
                                 }
                             }
                         }

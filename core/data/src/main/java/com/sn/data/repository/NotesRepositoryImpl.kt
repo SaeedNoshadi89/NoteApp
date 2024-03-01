@@ -19,7 +19,7 @@ class NotesRepositoryImpl @Inject constructor(
     private val calendarDataSource: CalendarDataSource
 ) : NotesRepository {
 
-    override fun getAllNotes(categoryId: Int?): Flow<List<Note>> = flow {
+    override fun getAllNotes(categoryId: Int?, selectedDate: LocalDate?): Flow<List<Note>> = flow{
         emit(localDataSource.getAllNotes(categoryId))
     }
 
@@ -81,6 +81,7 @@ class NotesRepositoryImpl @Inject constructor(
         flowOf(calendarDataSource.getData(lastSelectedDate = date))
 
     override fun getCategories(): Flow<List<Category>> = flowOf(LocalData.category)
+
 
 
 }

@@ -7,8 +7,11 @@ import com.sn.data.entity.NoteEntity
 
 @Dao
 interface NoteDao {
+    @Query("SELECT * FROM note")
+    fun getAllNotes(): List<NoteEntity>
+
     @Query("SELECT * FROM note WHERE category = :categoryId")
-    fun getAllNotes(categoryId: Int?): List<NoteEntity>
+    fun getNotes(categoryId: Int?): List<NoteEntity>
 
     @Query("SELECT * FROM note WHERE id = :noteId")
     fun getNoteById(noteId: String): NoteEntity?
