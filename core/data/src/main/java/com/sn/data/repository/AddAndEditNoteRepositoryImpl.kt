@@ -1,6 +1,5 @@
 package com.sn.data.repository
 
-import android.util.Log
 import com.sn.core.getDelayInMilliseconds
 import com.sn.data.data_sourse.LocalData
 import com.sn.data.data_sourse.LocalDataSource
@@ -45,12 +44,15 @@ class AddAndEditNoteRepositoryImpl @Inject constructor(
             category = category
         )
 
+
         if (dueDateTime.isNotEmpty()) {
             reminderScheduler?.scheduleReminder(
+                noteId = noteId,
                 dueDateTime = getDelayInMilliseconds(
                     dueDateTime.toLong(),
                     Clock.System.now()
-                ), noteTitle = title,
+                ),
+                noteTitle = title,
                 noteDescription = description
             )
         }
@@ -79,6 +81,17 @@ class AddAndEditNoteRepositoryImpl @Inject constructor(
             isCompleted = isCompleted,
             category = category
         )
+        if (dueDateTime.isNotEmpty()) {
+            reminderScheduler?.scheduleReminder(
+                noteId = noteId,
+                dueDateTime = getDelayInMilliseconds(
+                    dueDateTime.toLong(),
+                    Clock.System.now()
+                ),
+                noteTitle = title,
+                noteDescription = description
+            )
+        }
 
         localDataSource.upsertNote(note.toEntity())
     }

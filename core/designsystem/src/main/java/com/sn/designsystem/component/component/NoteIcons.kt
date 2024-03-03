@@ -11,7 +11,6 @@ object NoteIcons {
     val Mic = R.drawable.microphone
     val Message = R.drawable.message
     val Settings = R.drawable.setting
-    val Back = R.drawable.back
 
 }
 

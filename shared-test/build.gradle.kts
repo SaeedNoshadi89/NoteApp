@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.hilt.android.testing)
     implementation(libs.kotlin.date.time)
+    testImplementation(libs.mockito.core)
     ksp(libs.hilt.compiler)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

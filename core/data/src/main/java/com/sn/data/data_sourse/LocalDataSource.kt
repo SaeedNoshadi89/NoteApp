@@ -17,6 +17,4 @@ interface LocalDataSource {
     suspend fun getNoteById(noteId: String): NoteEntity?
 
     suspend fun clearCompletedNotes(): Int
-
-    suspend fun deleteAllNotes()
 }

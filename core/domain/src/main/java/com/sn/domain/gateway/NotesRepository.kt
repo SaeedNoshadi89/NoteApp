@@ -28,9 +28,8 @@ interface NotesRepository {
 
     suspend fun clearCompletedNotes()
 
-    suspend fun deleteAllNotes()
-
     fun getCalendar(startDate: LocalDate, lastSelectedDate: LocalDate): Flow<CalendarUiModel>
+
     fun setDateToCalendar(date: LocalDate): Flow<CalendarUiModel>
 
     fun getCategories(): Flow<List<Category>>

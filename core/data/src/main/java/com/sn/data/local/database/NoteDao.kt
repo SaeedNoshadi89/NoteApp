@@ -28,6 +28,4 @@ interface NoteDao {
     @Query("DELETE FROM note WHERE isCompleted = 1")
     suspend fun deleteCompleted(): Int
 
-    @Query("DELETE FROM note")
-    suspend fun deleteAll()
 }

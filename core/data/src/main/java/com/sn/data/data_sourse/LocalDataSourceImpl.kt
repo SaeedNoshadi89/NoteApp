@@ -25,7 +25,6 @@ class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : Lo
         noteDao.deleteById(noteId)
     }
 
-
     override suspend fun completeNote(noteId: String) = mutex.withLock {
         noteDao.updateCompleted(noteId = noteId, completed = true)
     }
@@ -38,13 +37,8 @@ class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : Lo
         return noteDao.getNoteById(noteId = noteId)
     }
 
-
     override suspend fun clearCompletedNotes(): Int = mutex.withLock {
         noteDao.deleteCompleted()
-    }
-
-    override suspend fun deleteAllNotes() = mutex.withLock {
-        noteDao.deleteAll()
     }
 
 }

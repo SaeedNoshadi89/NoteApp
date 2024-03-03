@@ -50,7 +50,4 @@ class FakeLocalDataSource(var notes: MutableList<NoteEntity>? = mutableListOf())
         return 1
     }
 
-    override suspend fun deleteAllNotes() {
-        notes?.clear()
-    }
 }

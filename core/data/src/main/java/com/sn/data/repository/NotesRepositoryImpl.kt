@@ -63,10 +63,6 @@ class NotesRepositoryImpl @Inject constructor(
         localDataSource.clearCompletedNotes()
     }
 
-    override suspend fun deleteAllNotes() {
-        localDataSource.deleteAllNotes()
-    }
-
     override fun getCalendar(
         startDate: LocalDate,
         lastSelectedDate: LocalDate

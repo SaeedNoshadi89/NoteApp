@@ -17,7 +17,7 @@ import com.sn.notes.ui.NotesUiState
 @Composable
 internal fun CategoryComponent(
     modifier: Modifier,
-    uiState: NotesUiState.Data,
+    uiState: NotesUiState,
     onSelectCategory: (Category) -> Unit
 ) {
     Row(

@@ -30,5 +30,4 @@ class GetAllNotesUseCase @Inject constructor(private val repository: NotesReposi
         return date.toString() == selectedDate.toString()
     }
 
-
 }

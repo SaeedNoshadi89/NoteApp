@@ -19,8 +19,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -44,11 +44,7 @@ class NotesViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val viewModelState = MutableStateFlow(
-        NotesViewModelState(
-            isLoading = true,
-        )
-    )
+    private val _uiState = MutableStateFlow(NotesUiState(isLoading = true))
 
     init {
         getCalendar()
@@ -56,18 +52,18 @@ class NotesViewModel @Inject constructor(
         getCategories()
     }
 
-    val uiState = viewModelState.map(NotesViewModelState::toUiState).stateIn(
+    val uiState: StateFlow<NotesUiState> = _uiState.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = viewModelState.value.toUiState()
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = _uiState.value
     )
 
     fun getNotes() {
-        viewModelState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch(ioDispatcher) {
-            getAllNotesUseCase(viewModelState.value.selectedCategory?.id, viewModelState.value.selectedDate)
+            getAllNotesUseCase(_uiState.value.selectedCategory?.id, _uiState.value.selectedDate)
                 .collectLatest { notes ->
-                viewModelState.update { it.copy(isLoading = false, notes = notes) }
+                    _uiState.update { it.copy(isLoading = false, notes = notes) }
             }
         }
     }
@@ -80,7 +76,7 @@ class NotesViewModel @Inject constructor(
     ) {
         viewModelScope.launch(ioDispatcher) {
             getCalendarUseCase(startDate, lastSelectedDate).collectLatest { calendar ->
-                viewModelState.update { it.copy(calendar = calendar) }
+                _uiState.update { it.copy(calendar = calendar) }
             }
         }
     }
@@ -91,9 +87,9 @@ class NotesViewModel @Inject constructor(
     ) {
         viewModelScope.launch(ioDispatcher) {
             date?.let { selectedDate ->
-                viewModelState.update { it.copy(selectedDate = selectedDate) }
-                setDateToCalendarUseCase(selectedDate).collectLatest { calendar ->
-                    getCalendar(selectedDate)
+                _uiState.update { it.copy(selectedDate = selectedDate) }
+                setDateToCalendarUseCase(selectedDate).collectLatest {
+                    getCalendar(it.selectedDate.date)
                     getNotes()
                 }
             }
@@ -103,13 +99,13 @@ class NotesViewModel @Inject constructor(
     private fun getCategories() {
         viewModelScope.launch(ioDispatcher) {
             repository.getCategories().collectLatest { result ->
-                viewModelState.update { it.copy(categories = result, selectedCategory = result[0]) }
+                _uiState.update { it.copy(categories = result, selectedCategory = result[0]) }
             }
         }
     }
 
     fun selectCategory(category: Category) {
-        viewModelState.update { it.copy(selectedCategory = category) }
+        _uiState.update { it.copy(selectedCategory = category) }
         getNotes()
     }
 
@@ -148,39 +144,13 @@ class NotesViewModel @Inject constructor(
 
 }
 
-sealed interface NotesUiState {
-    val isLoading: Boolean
-    val error: String
-
-    @Stable
-    data class Data(
-        val notes: List<Note>,
-        val calendar: CalendarUiModel? = null,
-        val selectedDate: LocalDate? = null,
-        val categories: List<Category>,
-        val selectedCategory: Category?,
-        override val isLoading: Boolean,
-        override val error: String
-    ) : NotesUiState
-}
-
-data class NotesViewModelState(
-    val isLoading: Boolean = false,
-    val error: String = "",
+@Stable
+data class NotesUiState(
+    val notes: List<Note> = emptyList(),
     val calendar: CalendarUiModel? = null,
     val selectedDate: LocalDate? = null,
     val categories: List<Category> = emptyList(),
     val selectedCategory: Category? = null,
-    val notes: List<Note> = emptyList(),
-) {
-    fun toUiState(): NotesUiState =
-        NotesUiState.Data(
-            isLoading = isLoading,
-            error = error,
-            notes = notes,
-            calendar = calendar,
-            selectedDate = selectedDate,
-            categories = categories,
-            selectedCategory = selectedCategory
-        )
-}
+    val isLoading: Boolean = false,
+    val error: String = ""
+)

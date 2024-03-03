@@ -37,7 +37,7 @@ import com.sn.domain.model.Note
 
 @Composable
 internal fun NoteRow(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     note: Note,
     onEditNote: (noteId: String) -> Unit,
     onCompleteNote: (String?) -> Unit,
@@ -110,8 +110,8 @@ internal fun NoteRow(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 OverlappingCircleImages(
-                    image1 = com.sn.designsystem.R.drawable.profile,
-                    image2 = com.sn.designsystem.R.drawable.profile
+                    image1 = R.drawable.profile,
+                    image2 = R.drawable.profile
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -123,13 +123,13 @@ internal fun NoteRow(
                             .clickable {
                                 if (note.isCompleted) onActiveNote(note.id) else onCompleteNote(note.id)
                             },
-                        painter = painterResource(id = com.sn.designsystem.R.drawable.archive_minus),
+                        painter = painterResource(id = R.drawable.archive_minus),
                         contentDescription = "save",
                         tint = if (note.isCompleted) Color.Red else Color.Unspecified
                     )
                     Icon(
                         modifier = modifier.clickable { note.id?.let { onEditNote(it) } },
-                        painter = painterResource(id = com.sn.designsystem.R.drawable.edit),
+                        painter = painterResource(id = R.drawable.edit),
                         contentDescription = "edit",
                         tint = Color.Unspecified
                     )

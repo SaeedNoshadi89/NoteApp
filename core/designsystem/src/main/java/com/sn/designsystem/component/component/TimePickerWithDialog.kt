@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -32,9 +34,9 @@ fun TimePickerWithDialog(
         initialHour = 0,
         initialMinute = 0
     )
-    if (showTimePicker){
+    if (showTimePicker) {
         Dialog(
-            onDismissRequest = {onDismiss() },
+            onDismissRequest = { onDismiss() },
         ) {
             Column(
                 modifier = modifier
@@ -43,7 +45,16 @@ fun TimePickerWithDialog(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TimePicker(state = timeState)
+                TimePicker(
+                    state = timeState,
+                    colors = TimePickerDefaults.colors(
+                        selectorColor = MaterialTheme.colorScheme.primary,
+                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.surface,
+                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.surface
+                    )
+                )
                 Row(
                     modifier = Modifier
                         .padding(top = 12.dp)

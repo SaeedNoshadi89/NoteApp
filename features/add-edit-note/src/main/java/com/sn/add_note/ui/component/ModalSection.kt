@@ -23,7 +23,7 @@ import com.sn.designsystem.component.component.SheetRow
 @Composable
 internal fun ModalSection(
     modifier: Modifier = Modifier,
-    uiState: AddNoteUiState.Data,
+    uiState: AddNoteUiState,
     onPickDate: () -> Unit,
     onPickTime: () -> Unit
 ) {

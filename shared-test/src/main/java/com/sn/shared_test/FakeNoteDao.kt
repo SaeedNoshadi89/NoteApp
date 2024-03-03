@@ -54,8 +54,4 @@ class FakeNoteDao(initialNotes: List<NoteEntity>? = emptyList()) : NoteDao {
         return 0
     }
 
-    override suspend fun deleteAll() {
-        _notes?.clear()
-    }
-
 }

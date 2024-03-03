@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(libs.androidx.work.ktx)
     implementation(libs.hilt.work)
+    implementation(libs.compose.navigation)
     kapt(libs.hilt.work.compiler)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

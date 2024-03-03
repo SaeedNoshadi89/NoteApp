@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.media.RingtoneManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -16,7 +17,7 @@ class NotificationHelper(val context: Context) {
 
     fun createNotification(title: String, message: String) {
         createNotificationChannel()
-
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val icon =
             BitmapFactory.decodeResource(context.resources, com.sn.designsystem.R.drawable.note)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -24,7 +25,8 @@ class NotificationHelper(val context: Context) {
             .setLargeIcon(icon)
             .setContentTitle(title)
             .setContentText(message)
-
+            .setAutoCancel(true)
+            .setSound(defaultSoundUri)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
         if (ActivityCompat.checkSelfPermission(

@@ -39,6 +39,7 @@ class NoteDaoTest {
             id = "id",
             isCompleted = false,
             dueDateTime = "1234567",
+            category = 1
         )
         database.noteDao().upsertNote(note)
 
@@ -63,6 +64,7 @@ class NoteDaoTest {
             id = "id",
             isCompleted = false,
             dueDateTime = "123456",
+            category = 1
         )
         database.noteDao().upsertNote(note)
 
@@ -72,7 +74,8 @@ class NoteDaoTest {
             description = "new description",
             isCompleted = true,
             id = note.id,
-            dueDateTime = "12345678"
+            dueDateTime = "12345678",
+            category = 1
         )
         database.noteDao().upsertNote(newNote)
 
@@ -94,11 +97,12 @@ class NoteDaoTest {
             id = "id",
             isCompleted = false,
             dueDateTime = "123456",
+            category = 1
         )
         database.noteDao().upsertNote(note)
 
         // WHEN - Get notes from the database
-        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
+        val notes = database.noteDao().getAllNotes()
 
         // THEN - There is only 1 note in the database, and contains the expected values
         assertEquals(1, notes.size)
@@ -118,6 +122,7 @@ class NoteDaoTest {
             id = "id",
             isCompleted = false,
             dueDateTime = "123456",
+            category = 1
         )
 
         database.noteDao().upsertNote(mainNote)
@@ -129,6 +134,7 @@ class NoteDaoTest {
             isCompleted = true,
             id = mainNote.id,
             dueDateTime = "12345678",
+            category = 1
         )
         database.noteDao().upsertNote(updatedNote)
 
@@ -149,7 +155,8 @@ class NoteDaoTest {
             description = "description",
             id = "id",
             isCompleted = true,
-            dueDateTime = "123456"
+            dueDateTime = "123456",
+            category = 1
         )
         database.noteDao().upsertNote(note)
 
@@ -174,6 +181,7 @@ class NoteDaoTest {
             id = "id",
             isCompleted = false,
             dueDateTime = "123456",
+            category = 1
         )
         database.noteDao().upsertNote(note)
 
@@ -181,28 +189,7 @@ class NoteDaoTest {
         database.noteDao().deleteById(note.id)
 
         // THEN - The list is empty
-        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
-        assertEquals(true, notes.isEmpty())
-    }
-
-    @Test
-    fun deleteNotesAndGettingNotes() = runTest {
-        // Given a note inserted
-        database.noteDao().upsertNote(
-            NoteEntity(
-                title = "title",
-                description = "description",
-                id = "id",
-                isCompleted = false,
-                dueDateTime = "123456",
-            )
-        )
-
-        // When deleting all notes
-        database.noteDao().deleteAll()
-
-        // THEN - The list is empty
-        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
+        val notes = database.noteDao().getAllNotes()
         assertEquals(true, notes.isEmpty())
     }
 
@@ -216,6 +203,7 @@ class NoteDaoTest {
                 id = "id",
                 isCompleted = true,
                 dueDateTime = "123456",
+                category = 1
             )
         )
 
@@ -223,7 +211,7 @@ class NoteDaoTest {
         database.noteDao().deleteCompleted()
 
         // THEN - The list is empty
-        val notes = database.noteDao().getAllNotes(categoryId, selectedDate)
+        val notes = database.noteDao().getAllNotes()
         assertEquals(true, notes.isEmpty())
     }
 }

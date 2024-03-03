@@ -39,8 +39,6 @@ import kotlin.math.absoluteValue
 fun <T> CarouselRow(
     list: List<T>,
     itemContainerColor: Color = MaterialTheme.colorScheme.background,
-    itemElevation: Dp = 4.dp,
-    itemShape: Dp = 14.dp,
     contentPadding: PaddingValues = PaddingValues(
         horizontal = 22.dp
     ),

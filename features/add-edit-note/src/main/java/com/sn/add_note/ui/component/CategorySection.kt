@@ -29,7 +29,7 @@ import com.sn.domain.model.Category
 @Composable
 internal fun CategorySection(
     modifier: Modifier = Modifier,
-    uiState: AddNoteUiState.Data,
+    uiState: AddNoteUiState,
     onCategory: (Category) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }

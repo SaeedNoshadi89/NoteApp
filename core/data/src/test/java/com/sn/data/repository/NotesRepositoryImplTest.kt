@@ -82,17 +82,6 @@ class NotesRepositoryImplTest {
 
     }
 
-    @ExperimentalCoroutinesApi
-    @Test
-    fun getNotes_emptyRepositoryAndUninitializedCache() = runTest {
-        turbineScope {
-            localDataSource.deleteAllNotes()
-
-            val notes = notesRepository.getAllNotes(categoryId = 1, selectedDate = null).testIn(backgroundScope).awaitItem()
-            assertThat(notes.size).isEqualTo(0)
-        }
-    }
-
     @Test
     fun completeNote_completesNote_UpdatesCache() = runTest {
         turbineScope {
@@ -162,24 +151,6 @@ class NotesRepositoryImplTest {
             assertThat(notes).hasSize(1)
             assertThat(notes).contains(note2)
             assertThat(notes).doesNotContain(completedNote)
-        }
-    }
-
-    @Test
-    fun deleteAllNotes() = runTest {
-        turbineScope {
-            val initialNotes = notesRepository.getAllNotes(1, null).testIn(backgroundScope).awaitItem()
-
-            // Verify notes are returned
-            assertThat(initialNotes.size).isEqualTo(1)
-
-            // Delete all notes
-            notesRepository.deleteAllNotes()
-
-            // Verify notes are empty now
-            val afterDeleteNotes =
-                notesRepository.getAllNotes(1, null).testIn(backgroundScope).awaitItem()
-            assertThat(afterDeleteNotes).isEmpty()
         }
     }
 
