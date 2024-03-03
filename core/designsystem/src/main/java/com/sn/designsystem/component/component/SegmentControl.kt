@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +53,12 @@ fun SegmentedControl(
     var selectedIndex by remember { mutableIntStateOf(defaultSelectedItemIndex) }
     var itemIndex by remember { mutableIntStateOf(defaultSelectedItemIndex) }
 
-
+    DisposableEffect(key1 = Unit) {
+        if (items.isNotEmpty()){
+            onItemSelection(items[selectedIndex])
+        }
+        onDispose {  }
+    }
     Card(
         modifier = modifier
             .fillMaxWidth()

@@ -20,6 +20,7 @@ internal fun CategoryComponent(
     uiState: NotesUiState,
     onSelectCategory: (Category) -> Unit
 ) {
+
     Row(
         modifier = modifier
             .fillMaxWidth(),

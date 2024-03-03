@@ -46,7 +46,10 @@ fun NotesScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getNotes()
+        viewModel.apply {
+            getCategories()
+            getNotes()
+        }
     }
 
     Column(
