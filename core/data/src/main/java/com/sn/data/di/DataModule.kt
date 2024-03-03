@@ -2,6 +2,8 @@ package com.sn.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.sn.data.data_sourse.CalendarDataSource
+import com.sn.data.data_sourse.CalendarDataSourceImpl
 import com.sn.data.data_sourse.LocalDataSource
 import com.sn.data.data_sourse.LocalDataSourceImpl
 import com.sn.data.data_sourse.ReminderScheduler
@@ -35,6 +37,10 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindReminderScheduler(reminderScheduler: ReminderSchedulerImpl): ReminderScheduler
+
+    @Singleton
+    @Binds
+    abstract fun bindCalendarDataSource(calendarDataSourceImpl: CalendarDataSourceImpl): CalendarDataSource
 }
 
 @Module

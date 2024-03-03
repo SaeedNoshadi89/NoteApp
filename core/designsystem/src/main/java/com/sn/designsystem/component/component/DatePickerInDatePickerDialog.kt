@@ -1,8 +1,10 @@
 package com.sn.designsystem.component.component
 
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -29,6 +31,7 @@ fun DatePickerInDatePickerDialog(
     if (openDialog) {
 
         DatePickerDialog(
+            colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
             onDismissRequest = {
                 onDismiss()
             },

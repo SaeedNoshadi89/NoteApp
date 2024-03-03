@@ -3,8 +3,6 @@ package com.sn.designsystem.component.component
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +16,6 @@ import com.sn.domain.model.CalendarUiModel
 @Composable
 fun CalendarContent(
     modifier: Modifier = Modifier,
-    lazyState: LazyListState = rememberLazyListState(),
     data: CalendarUiModel,
     onPrevClickListener: () -> Unit,
     onNextClickListener: () -> Unit,

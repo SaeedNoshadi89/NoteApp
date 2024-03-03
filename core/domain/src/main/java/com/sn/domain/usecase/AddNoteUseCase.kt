@@ -9,11 +9,13 @@ class AddNoteUseCase @Inject constructor(private val repository: AddAndEditNoteR
         description: String,
         dueDateTime: String,
         isCompleted: Boolean,
+        category: Int
     ) =
         repository.createNote(
             title = title,
             description = description,
             dueDateTime = dueDateTime,
-            isCompleted = isCompleted
+            isCompleted = isCompleted,
+            category = category
         )
 }

@@ -8,7 +8,7 @@ import kotlinx.datetime.LocalDate
 
 interface NotesRepository {
 
-    fun getAllNotes(categoryId: Int?): Flow<List<Note>>
+    fun getAllNotes(categoryId: Int?, selectedDate: LocalDate?): Flow<List<Note>>
 
     fun getNoteById(noteId: String): Flow<Note?>
 
@@ -28,9 +28,8 @@ interface NotesRepository {
 
     suspend fun clearCompletedNotes()
 
-    suspend fun deleteAllNotes()
-
     fun getCalendar(startDate: LocalDate, lastSelectedDate: LocalDate): Flow<CalendarUiModel>
+
     fun setDateToCalendar(date: LocalDate): Flow<CalendarUiModel>
 
     fun getCategories(): Flow<List<Category>>

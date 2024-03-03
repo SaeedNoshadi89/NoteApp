@@ -12,7 +12,9 @@ class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : Lo
 
     private val mutex = Mutex()
     override suspend fun getAllNotes(categoryId: Int?): List<Note> = mutex.withLock {
-        return noteDao.getAllNotes(categoryId).toModel()
+        return if (categoryId == 1) noteDao.getAllNotes().toModel() else noteDao.getNotes(
+            categoryId
+        ).toModel()
     }
 
     override suspend fun upsertNote(note: NoteEntity) = mutex.withLock {
@@ -22,7 +24,6 @@ class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : Lo
     override suspend fun deleteNote(noteId: String): Int = mutex.withLock {
         noteDao.deleteById(noteId)
     }
-
 
     override suspend fun completeNote(noteId: String) = mutex.withLock {
         noteDao.updateCompleted(noteId = noteId, completed = true)
@@ -36,13 +37,8 @@ class LocalDataSourceImpl @Inject constructor(private val noteDao: NoteDao) : Lo
         return noteDao.getNoteById(noteId = noteId)
     }
 
-
     override suspend fun clearCompletedNotes(): Int = mutex.withLock {
         noteDao.deleteCompleted()
-    }
-
-    override suspend fun deleteAllNotes() = mutex.withLock {
-        noteDao.deleteAll()
     }
 
 }

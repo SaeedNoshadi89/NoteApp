@@ -15,7 +15,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "NoteApp"
 include(":app")
-include(":benchmark")
 include(":core:data")
 include(":core:domain")
 include(":core:work")

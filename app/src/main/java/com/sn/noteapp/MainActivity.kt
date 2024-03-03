@@ -75,6 +75,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
 
 private val lightScrim = android.graphics.Color.argb(0xe6, 0xFF, 0xFF, 0xFF)

@@ -13,12 +13,11 @@ fun NavController.navigateToNotes( navOptions: NavOptions? = null){
 }
 
 fun NavGraphBuilder.notesScreenGraph(
-    onShowSnackbar: suspend (String) -> Boolean,
     onEditNote: (noteId: String) -> Unit,
 ) {
     composable(
         route = notesRoute
     ) {
-        NotesScreen(onShowSnackbar = {onShowSnackbar(it)}, onEditNote = {onEditNote(it)})
+        NotesScreen(onEditNote = {onEditNote(it)})
     }
 }

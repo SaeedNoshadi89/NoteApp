@@ -40,7 +40,11 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.hilt.android)
     implementation(libs.kotlin.date.time)
+    testImplementation(libs.mockito.core)
     testImplementation(libs.junit)
+    testImplementation(libs.ui.test.junit4)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.google.truth)
 }

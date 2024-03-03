@@ -17,12 +17,13 @@ fun NoteNavHost(
     startDestination: String = notesRoute,
 ) {
     val navController = appState.navController
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        notesScreenGraph( onShowSnackbar = onShowSnackbar, onEditNote = {
+        notesScreenGraph( onEditNote = {
             navController.navigateToAddOrEditNote(it)
         })
 

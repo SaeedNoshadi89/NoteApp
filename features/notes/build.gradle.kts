@@ -86,6 +86,7 @@ dependencies {
     testImplementation(libs.espresso.core)
     testImplementation(libs.google.truth)
     testImplementation(libs.androidx.compose.ui.test.junit)
+    testImplementation(libs.turbine)
 
     // JVM tests - Hilt
     testImplementation(libs.hilt.android.testing)
