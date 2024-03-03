@@ -32,6 +32,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     java {
@@ -80,7 +81,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.compose.navigation)
-    implementation(libs.canary.leack)
+    debugImplementation(libs.canary.leack)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.work.ktx)
     implementation(libs.hilt.work)

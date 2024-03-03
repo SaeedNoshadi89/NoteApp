@@ -49,7 +49,6 @@ class NotesViewModel @Inject constructor(
     init {
         getCalendar()
         selectDate()
-        getCategories()
     }
 
     val uiState: StateFlow<NotesUiState> = _uiState.stateIn(
@@ -62,7 +61,7 @@ class NotesViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch(ioDispatcher) {
             getAllNotesUseCase(_uiState.value.selectedCategory?.id, _uiState.value.selectedDate)
-                .collectLatest { notes ->
+                .collect { notes ->
                     _uiState.update { it.copy(isLoading = false, notes = notes) }
             }
         }
@@ -96,7 +95,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun getCategories() {
+    fun getCategories() {
         viewModelScope.launch(ioDispatcher) {
             repository.getCategories().collectLatest { result ->
                 _uiState.update { it.copy(categories = result, selectedCategory = result[0]) }

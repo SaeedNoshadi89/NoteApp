@@ -24,7 +24,7 @@ class GetAllNotesUseCase @Inject constructor(private val repository: NotesReposi
         }
 
     private fun isMatchingDate(dueDateTime: String, selectedDate: LocalDate?): Boolean {
-        if (selectedDate == null) return true
+        if (selectedDate == null || dueDateTime.isEmpty()) return true
 
         val date = dueDateTime.getFormattedDateTime().date
         return date.toString() == selectedDate.toString()
